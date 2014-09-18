@@ -1,0 +1,13 @@
+# Siteleaf API Authentication and site settings
+Siteleaf:
+    api_key: "YOUR SITELEAF API KEY"
+    api_secret: "YOUR SITELEAF API SECRET"
+    site_id: "ID OF SITE TO IMPORT POSTS INTO"
+    page_id: "ID OF BLOG PAGE TO IMPORT POSTS INTO"
+
+# Ghost export file
+Ghost:
+    export_file: "GHOST EXPORT JSON FILE NAME"
+
+# change to true to only test your import
+test_mode: false
