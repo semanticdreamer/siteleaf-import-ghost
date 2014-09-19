@@ -4,6 +4,10 @@ Ruby import script for importing blog post from the [Ghost][Ghost] blogging plat
 
 The script leverages the [Siteleaf Gem][Siteleaf Gem] for accessing the [Siteleaf API][Siteleaf API]. 
 
+## Credits
+
+Based on [sskylar](https://gist.github.com/sskylar)'s [Siteleaf import script](https://gist.github.com/sskylar/5824224).
+
 ## Features
 
 The script will import the blog posts from [Ghost][Ghost]'s `*.json` export file into a configurable (`config.yml`) Siteleaf site and page.
@@ -44,10 +48,6 @@ For convenience all relative image assets are listed at the end of the import, t
        image4.jpg
     
     -------------------------------------------
-
-## Credits
-
-Based on [sskylar](https://gist.github.com/sskylar)'s [Siteleaf import script](https://gist.github.com/sskylar/5824224).
 
 ## Prerequisites
 
