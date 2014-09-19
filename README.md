@@ -24,6 +24,27 @@ The relative image asset's file path (`![](/contents/images/.../image.png)`) fro
 
 For convenience all relative image assets are listed at the end of the import, to assist with the manual upload.
 
+**Example Output**
+
+    -------------------------------------------
+        Import Ghost blog posts to Siteleaf.     
+    -------------------------------------------
+    
+    importing post 1, 'Awesome blog post #1'...
+    importing post 2, 'Awesome blog post #2'...
+    importing post 3, 'Awesome blog post #3'...
+    
+    -------------------------------------------
+     - 3 post(s) found in Ghost export
+     - 3 post(s) successfully imported
+     - relative path for 4 img assets updated  ☞  to be manually uploaded to Siteleaf:
+       image1.png
+       image2.png
+       image3.jpg
+       image4.jpg
+    
+    -------------------------------------------
+
 ## Credits
 
 Based on [sskylar](https://gist.github.com/sskylar)'s [Siteleaf import script](https://gist.github.com/sskylar/5824224).

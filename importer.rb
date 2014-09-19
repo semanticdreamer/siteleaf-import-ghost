@@ -83,7 +83,7 @@ contents['data']['posts'].each do |content|
   post.published_at = content["published_at"]
   
   # save
-  if !test_mode && post_id == 28
+  if !test_mode
     post.save
     posts_count += 1
   end
