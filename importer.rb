@@ -30,9 +30,20 @@ test_mode = config['test_mode']
 # get entries from JSON export
 contents = JSON.parse(File.read(export_file))
 
+assets = Array.new
+posts_count = 0
+
+puts "\n-------------------------------------------"
+puts "    Import Ghost blog posts to Siteleaf.     "
+puts "-------------------------------------------\n\n"
+
 # loop through and add entries
 contents['data']['posts'].each do |content|
-  puts "Creating post..."
+  
+  post_id = content["id"]
+  post_title = content["title"]
+  
+  puts "importing post #{post_id}, '#{post_title}'..."
   
   # set up post
   post = Siteleaf::Post.new
@@ -40,8 +51,18 @@ contents['data']['posts'].each do |content|
   post.parent_id = page_id
   
   # required
-  post.title = content["title"]
-  post.body = content["markdown"]
+  post.title = post_title
+  
+  body_content = content["markdown"]
+  # convert any relative Ghost image path, i.e. "/content/images/.../image.png"
+  # within the markdown to a Siteleaf relative image path, i.e. "/assets/image.png"
+  body_content = body_content.gsub(/!\[([^\]]*)\]\((?!https?:\/\/)(.+)\)/) do |match|
+    asset_file = File.basename($2)
+    assets << asset_file
+    updated_image_path = File.join("/assets/", asset_file)
+    %{![#{$1}](#{updated_image_path})}
+  end 
+  post.body = body_content
   
   # optional
   visibility = (content["status"] == 'published' ? 'visible' : 'draft')
@@ -49,7 +70,6 @@ contents['data']['posts'].each do |content|
     
   # find all posts_tags by post_id
   tags = Array.new
-  post_id = content["id"]
   posts_tags = contents["data"]["posts_tags"].select { |h| h['post_id'] == post_id }
   posts_tags.each do |post_tag|
     # get tag by tag_id
@@ -63,8 +83,19 @@ contents['data']['posts'].each do |content|
   post.published_at = content["published_at"]
   
   # save
-  puts test_mode ? post.inspect : post.save.inspect
+  if !test_mode && post_id == 28
+    post.save
+    posts_count += 1
+  end
+  
 end
 
 # done!
-puts "Success!"
+puts "\n-------------------------------------------\n"
+puts " - #{contents['data']['posts'].length} post(s) found in Ghost export"
+puts " - #{posts_count} post(s) successfully imported"
+puts " - relative path for #{assets.length} img assets updated  ☞  to be manually uploaded to Siteleaf:"
+assets.each do |asset|
+  puts "   #{asset}"
+end
+puts "\n-------------------------------------------\n"
