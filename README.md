@@ -4,7 +4,7 @@ Ruby import script for importing blog post from the [Ghost][Ghost] blogging plat
 
 The script imports the blog posts from [Ghost][Ghost]'s `*.json` export file for blog settings and data into a configurable Siteleaf site and page.
 
-The script leverages the [Siteleaf Gem][Siteleaf Gem] for accessing the Siteleaf API. 
+The script leverages the [Siteleaf Gem][Siteleaf Gem] for accessing the [Siteleaf API][Siteleaf API]. 
 
 ## Credits
 
@@ -33,11 +33,11 @@ The, run on the command line:
 
 ## Todo
 
-- Add support for importing Ghost's Tags into Siteleaf's Taxonomy.
 - Add support for images uploaded to Ghost: parse image file path (`![]()`) from Ghost's `markdown` content, then fetch (download) the file and upload the asset to Siteleaf.
 
 [Siteleaf]: http://siteleaf.com/
 [Siteleaf Gem]: https://github.com/siteleaf/siteleaf-gem
+[Siteleaf API]: https://github.com/siteleaf/siteleaf-api
 [Ghost]: http://ghost.org/
 [Ruby]: http://www.ruby-lang.org/
 [Bundler]: http://bundler.io/

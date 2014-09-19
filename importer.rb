@@ -46,9 +46,20 @@ contents['data']['posts'].each do |content|
   # optional
   visibility = (content["status"] == 'published' ? 'visible' : 'draft')
   post.visibility = visibility
-  # post.taxonomy = [
-  #   {"key" => "Tags", "values" => content["tags"]}
-  # ]
+    
+  # find all posts_tags by post_id
+  tags = Array.new
+  post_id = content["id"]
+  posts_tags = contents["data"]["posts_tags"].select { |h| h['post_id'] == post_id }
+  posts_tags.each do |post_tag|
+    # get tag by tag_id
+    tag = contents["data"]["tags"].select { |h| h['id'] == post_tag["tag_id"] }.first
+    tags << tag["name"]
+  end
+  post.taxonomy = [
+    {"key" => "Tags", "values" => tags}
+  ]
+  
   post.published_at = content["published_at"]
   
   # save
