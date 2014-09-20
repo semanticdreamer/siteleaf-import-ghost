@@ -11,8 +11,8 @@ end
 if config['Siteleaf']['site_id'].nil? || config['Siteleaf']['page_id'].nil?
   raise RuntimeError, "Importer requires valid Siteleaf site settings in the config.yml file."
 end
-if !File.file?(config['Ghost']['export_file'])
-  raise RuntimeError, "Importer requires a valid Ghost *.json file in the config.yml file."
+if !File.file?(config['Ghost']['export_file']) || config['Ghost']['site_url'].nil?
+  raise RuntimeError, "Importer requires valid Ghost settings and *.json export in the config.yml file."
 end
 
 # Siteleaf API settings
@@ -103,7 +103,7 @@ contents['data']['posts'].each do |content|
           open(File.join(config['assets_download_dir'], File.basename(ghost_asset)), 'wb') do |file|
             file << open(File.join(config['Ghost']['site_url'], ghost_asset)).read
           end
-          # ... and upload asset to post
+          # ... and upload asset, assoc. w/ post
           siteleaf_asset = Siteleaf::Asset.create({
             :post_id  => resp.id, 
             :file     => File.open(File.join(config['assets_download_dir'], File.basename(ghost_asset))), 
@@ -114,14 +114,14 @@ contents['data']['posts'].each do |content|
             puts " - asset.create SUCCESS: " + File.basename(siteleaf_asset.url)
             success_assets_count += 1
           else
-            puts " - asset.creat ERROR!!!\n" + siteleaf_asset.inspect + "\n"
+            puts " - asset.create ERROR!!!\n" + siteleaf_asset.inspect + "\n"
             failure_assets_count += 1
           end
         end
       end
       
     else
-      puts " - post.creat ERROR!!!\n" + resp.inspect + "\n"
+      puts " - post.create ERROR!!!\n" + resp.inspect + "\n"
       failure_posts_count += 1
     end
   end

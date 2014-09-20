@@ -69,11 +69,13 @@ Install required `gems` (see `Gemfile`), preferably using [Bundler][Bundler]:
 
 Rename `config.yml.dist` to `config.yml` and provide your configuration...
 
-The, run on the command line:
+Then, run on the command line:
 
     $ ruby importer.rb
 
 ... and relax! :-)
+
+**Please note that subsequent runs of the importer will result in duplicate Siteleaf posts and assets!**
 
 [Siteleaf]: http://siteleaf.com/
 [Siteleaf Gem]: https://github.com/siteleaf/siteleaf-gem
