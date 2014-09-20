@@ -1,5 +1,6 @@
 require "siteleaf"
 require "json"
+require 'open-uri'
 
 config = YAML.load_file('config.yml')
 
@@ -30,9 +31,11 @@ test_mode = config['test_mode']
 # get entries from JSON export
 contents = JSON.parse(File.read(export_file))
 
-assets = Array.new
+siteleaf_assets = Array.new
 success_posts_count = 0
 failure_posts_count = 0
+success_assets_count = 0
+failure_assets_count = 0
 
 puts "\n-------------------------------------------"
 puts "    Import Ghost blog posts to Siteleaf.     "
@@ -57,12 +60,14 @@ contents['data']['posts'].each do |content|
   body_content = content["markdown"]
   # convert any relative Ghost image path, i.e. "/content/images/.../image.png"
   # within the markdown to a Siteleaf relative image path, i.e. "/assets/image.png"
+  ghost_assets = Array.new
   body_content = body_content.gsub(/!\[([^\]]*)\]\((?!https?:\/\/)(.+)\)/) do |match|
-    asset_file = File.basename($2)
-    assets << asset_file
-    updated_image_path = File.join("/assets/", asset_file)
+    asset_file_path = $2
+    ghost_assets << asset_file_path
+    updated_image_path = File.join("/assets/", File.basename(asset_file_path))
     %{![#{$1}](#{updated_image_path})}
-  end 
+  end
+  
   post.body = body_content
   
   # optional
@@ -72,7 +77,7 @@ contents['data']['posts'].each do |content|
   # find all posts_tags by post_id
   tags = Array.new
   posts_tags = contents["data"]["posts_tags"].select { |h| h['post_id'] == post_id }
-  if !posts_tags.length == 0
+  if posts_tags.length > 0
     posts_tags.each do |post_tag|
       # get tag by tag_id
       tag = contents["data"]["tags"].select { |h| h['id'] == post_tag["tag_id"] }.first
@@ -89,10 +94,34 @@ contents['data']['posts'].each do |content|
   if !test_mode# && post_id == 28
     resp = post.save
     if resp.id
-      puts "SUCCESS!"
+      puts " - post.create SUCCESS: " + resp.id
       success_posts_count += 1
+      
+      # fetch image assets...
+      if ghost_assets.length > 0
+        ghost_assets.each do |ghost_asset|
+          open(File.join(config['assets_download_dir'], File.basename(ghost_asset)), 'wb') do |file|
+            file << open(File.join(config['Ghost']['site_url'], ghost_asset)).read
+          end
+          # ... and upload asset to post
+          siteleaf_asset = Siteleaf::Asset.create({
+            :post_id  => resp.id, 
+            :file     => File.open(File.join(config['assets_download_dir'], File.basename(ghost_asset))), 
+            :filename => File.basename(ghost_asset)
+          })
+          if siteleaf_asset.id
+            siteleaf_assets << siteleaf_asset.url
+            puts " - asset.create SUCCESS: " + File.basename(siteleaf_asset.url)
+            success_assets_count += 1
+          else
+            puts " - asset.creat ERROR!!!\n" + siteleaf_asset.inspect + "\n"
+            failure_assets_count += 1
+          end
+        end
+      end
+      
     else
-      puts "ERROR\n" + resp.inspect + "\n"
+      puts " - post.creat ERROR!!!\n" + resp.inspect + "\n"
       failure_posts_count += 1
     end
   end
@@ -101,11 +130,9 @@ end
 
 # done!
 puts "\n-------------------------------------------\n"
-puts " - #{contents['data']['posts'].length} post(s) found in Ghost export"
-puts " - import SUCCEEDED for #{success_posts_count} post(s)... :-)"
-puts " - import FAILED for #{failure_posts_count} post(s)... :-("
-puts " - relative path for #{assets.length} img assets updated  ☞  to be manually uploaded to Siteleaf:"
-assets.each do |asset|
-  puts "   #{asset}"
-end
+puts "Total of #{contents['data']['posts'].length} posts found in Ghost export.\n"
+puts " ☺ post import SUCCEEDED for #{success_posts_count} posts."
+puts "  ☹ post import FAILED for #{failure_posts_count} posts.\n" if failure_posts_count > 0
+puts " ☺ asset upload SUCCEEDED for #{success_assets_count} assets."
+puts "  ☹ asset upload FAILED for #{failure_assets_count} assets." if failure_assets_count > 0
 puts "\n-------------------------------------------\n"

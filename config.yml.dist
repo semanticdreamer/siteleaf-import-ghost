@@ -2,12 +2,16 @@
 Siteleaf:
     api_key: "YOUR SITELEAF API KEY"
     api_secret: "YOUR SITELEAF API SECRET"
-    site_id: "ID OF SITE TO IMPORT POSTS INTO"
-    page_id: "ID OF BLOG PAGE TO IMPORT POSTS INTO"
+    site_id: "ID OF SITE TO IMPORT POSTS INTO, i.e. https://manage.siteleaf.com/sites/SITE_ID/pages"
+    page_id: "ID OF BLOG PAGE TO IMPORT POSTS INTO, i.e. https://manage.siteleaf.com/pages/PAGE_ID/edit"
 
-# Ghost export file
+# Ghost site url (w/ out trailing slash) and local export file
 Ghost:
+    site_url: http://example.com
     export_file: "GHOST EXPORT JSON FILE NAME"
+
+# local directory to download Ghost image assets into
+assets_download_dir: ./assets/
 
 # change to true to only test your import
 test_mode: false

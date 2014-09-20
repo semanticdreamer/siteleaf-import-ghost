@@ -10,7 +10,7 @@ Based on [sskylar](https://gist.github.com/sskylar)'s [Siteleaf import script](h
 
 ## Features
 
-The script will import the blog posts from [Ghost][Ghost]'s `*.json` export file into a configurable (`config.yml`) Siteleaf site and page.
+The script will import the blog posts along w/ any local image assets from [Ghost][Ghost]'s `*.json` export file into a configurable (`config.yml`) Siteleaf site and page.
 
 **Fields**
 
@@ -21,37 +21,42 @@ The following blog post fields are imported:
 - `markdown` content/ body
 - `published_at` date
 - `tags`
+- `assets`
 
 **Asset Handling**
 
-The relative image asset's file path (`![](/contents/images/.../image.png)`) from Ghost's `markdown` content are parsed and udpated to match Siteleaf's `/assets/image.png` path. 
+The relative image asset file paths (`![](/contents/images/.../image.png)`) from Ghost's `markdown` content are parsed and udpated to match Siteleaf's `/assets/image.png` path. 
 
-For convenience all relative image assets are listed at the end of the import, to assist with the manual upload.
+The image asset files are then uploaded to Siteleaf and associated w/ the according posts. Also for convenience the files are stored in the directory provided for config option `assets_download_dir`.
+
+**Test Mode (optional)**
+
+If the config option `test_mode` is set to `true` (default `false`) neither posts nor assets are imported (saved).
 
 **Example Output**
 
     -------------------------------------------
         Import Ghost blog posts to Siteleaf.     
     -------------------------------------------
-    
+
     importing post 1, 'Awesome blog post #1'...
+     - post.create SUCCESS: 1234567890abc123456789db
+     - asset.create SUCCESS: image1.png
     importing post 2, 'Awesome blog post #2'...
-    importing post 3, 'Awesome blog post #3'...
+     - post.create SUCCESS: 2234567890abc223456789db
     
     -------------------------------------------
-     - 3 post(s) found in Ghost export
-     - 3 post(s) successfully imported
-     - relative path for 4 img assets updated  ☞  to be manually uploaded to Siteleaf:
-       image1.png
-       image2.png
-       image3.jpg
-       image4.jpg
+    Total of 2 posts found in Ghost export.
+     ☺ post import SUCCEEDED for 2 posts.
+     ☺ asset upload SUCCEEDED for 1 assets.
     
     -------------------------------------------
 
 ## Prerequisites
 
-- [Ruby][Ruby] (tested with **v2.1.2**)
+- import target: [Siteleaf][Siteleaf] account, site and page
+- export source: [Ghost][Ghost] (tested w/ **v0.4.2**) **Note:** site should still be online (for download of image assets in Ghost posts)
+- [Ruby][Ruby] (tested w/ **v2.1.2**)
 - [Bundler][Bundler]
 
 ## Setup
