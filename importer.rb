@@ -31,7 +31,8 @@ test_mode = config['test_mode']
 contents = JSON.parse(File.read(export_file))
 
 assets = Array.new
-posts_count = 0
+success_posts_count = 0
+failure_posts_count = 0
 
 puts "\n-------------------------------------------"
 puts "    Import Ghost blog posts to Siteleaf.     "
@@ -71,21 +72,29 @@ contents['data']['posts'].each do |content|
   # find all posts_tags by post_id
   tags = Array.new
   posts_tags = contents["data"]["posts_tags"].select { |h| h['post_id'] == post_id }
-  posts_tags.each do |post_tag|
-    # get tag by tag_id
-    tag = contents["data"]["tags"].select { |h| h['id'] == post_tag["tag_id"] }.first
-    tags << tag["name"]
+  if !posts_tags.length == 0
+    posts_tags.each do |post_tag|
+      # get tag by tag_id
+      tag = contents["data"]["tags"].select { |h| h['id'] == post_tag["tag_id"] }.first
+      tags << tag["name"]
+    end
+    post.taxonomy = [
+      {"key" => "Tags", "values" => tags}
+    ]
   end
-  post.taxonomy = [
-    {"key" => "Tags", "values" => tags}
-  ]
   
   post.published_at = content["published_at"]
   
   # save
-  if !test_mode
-    post.save
-    posts_count += 1
+  if !test_mode# && post_id == 28
+    resp = post.save
+    if resp.id
+      puts "SUCCESS!"
+      success_posts_count += 1
+    else
+      puts "ERROR\n" + resp.inspect + "\n"
+      failure_posts_count += 1
+    end
   end
   
 end
@@ -93,7 +102,8 @@ end
 # done!
 puts "\n-------------------------------------------\n"
 puts " - #{contents['data']['posts'].length} post(s) found in Ghost export"
-puts " - #{posts_count} post(s) successfully imported"
+puts " - import SUCCEEDED for #{success_posts_count} post(s)... :-)"
+puts " - import FAILED for #{failure_posts_count} post(s)... :-("
 puts " - relative path for #{assets.length} img assets updated  ☞  to be manually uploaded to Siteleaf:"
 assets.each do |asset|
   puts "   #{asset}"
